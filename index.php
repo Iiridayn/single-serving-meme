@@ -23,7 +23,7 @@ function drawText($image, $color, $stroke, $text, $x, $y) {
 }
 
 function genImage($row, $secure = false) {
-	global $font;
+	global $font, $size;
 
 	$imagefile = 'var/' . $row['id'] . '.' . $row['ext'];
 	$image;
@@ -49,11 +49,11 @@ function genImage($row, $secure = false) {
 	$height = imagesy($image);
 
 	if (!empty($row['top'])) {
-		$coords = imagettfbbox($size, 0, $font, $row['top']);
+		$coords = imageftbbox($size, 0, $font, $row['top']);
 		drawText(
 			$image, $color, $stroke, $row['top'],
-			$coords[0] + ($width / 2) - ($coords[4] / 2),
-			$height * 0.10
+			$coords[0] + ($width - $coords[4]) / 2,
+			($coords[1] - $coords[5]) + $height * 0.05
 		);
 	}
 
@@ -61,8 +61,8 @@ function genImage($row, $secure = false) {
 		$coords = imagettfbbox($size, 0, $font, $row['bottom']);
 		drawText(
 			$image, $color, $stroke, $row['bottom'],
-			$coords[0] + ($width / 2) - ($coords[4] / 2),
-			$height * 0.90
+			$coords[0] + ($width - $coords[4]) / 2,
+			-($coords[1] - $coords[5]) / 2 + $height * 0.95
 		);
 	}
 
@@ -70,8 +70,8 @@ function genImage($row, $secure = false) {
 		$coords = imagettfbbox($size, 0, $font, $row['secret']);
 		drawText(
 			$image, $color, $stroke, $row['secret'],
-			$coords[0] + ($width / 2) - ($coords[4] / 2),
-			$coords[1] + ($height * 0.35) + ($coords[5] / 2)
+			$coords[0] + ($width - $coords[4]) / 2,
+			($coords[1] - $coords[5]) / 2 + ($height * 0.35)
 		);
 
 		// Add text - "now, reload the page" to whatever they say
@@ -79,7 +79,7 @@ function genImage($row, $secure = false) {
 		$coords = imagettfbbox($size, 0, $font, $text);
 		drawText(
 			$image, $color, $stroke, $text,
-			$coords[0] + ($width / 2) - ($coords[4] / 2),
+			$coords[0] + ($width - $coords[4]) / 2,
 			$coords[1] + ($height * 0.7) + ($coords[5] / 2)
 		);
 	}
