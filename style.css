@@ -1,0 +1,20 @@
+* {
+	box-sizing: border-box;
+	font-size: 16px;
+}
+label {
+	width: 6em;
+	display: inline-block;
+}
+input[type="text"] {
+	width: 20em;
+}
+textarea {
+	width: 20em;
+	height: 3em;
+}
+
+img {
+	max-width: 100%;
+	display: block;
+}
