@@ -3,11 +3,14 @@
 session_name("MEMES");
 session_start();
 
-$domain = 'http://localhost:8006';
+$domain = 'http' . (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
 
-$db = new SQLite3('images.db');
+$dbfile = '../db/images.db';
+if ($_SERVER['SERVER_NAME'] === 'localhost')
+	$dbfile = 'images.db';
+$db = new SQLite3($dbfile);
 
-$font = '/usr/share/fonts/WindowsFonts/impact.ttf';
+$font = '/usr/share/fonts/TTF/Impact.TTF'; // ttf-ms-fonts in aur
 $size = 36;
 
 function drawText($image, $color, $stroke, $text, $x, $y) {
@@ -106,10 +109,10 @@ function genImage($row, $secure = false) {
 $baseUrl = substr($_SERVER['SCRIPT_NAME'], 0, stripos($_SERVER['SCRIPT_NAME'], 'index.php'));
 $path = isset($_SERVER['PATH_INFO']) ? explode('/', substr($_SERVER['PATH_INFO'], 1)) : [];
 
-if ($path[0] == 'preview') {
+if (isset($path[0]) && $path[0] == 'preview') {
 	genImage($_SESSION['meme'], array_key_exists('secure', $_GET));
 	die;
-} else if ($path[0]) {
+} else if (isset($path[0])) {
 	// find image in db, check if already served, if so serve w/o hidden text
 	$statement = $db->prepare('SELECT * FROM images WHERE id = :id');
 	$statement->bindValue(':id', $path[0]);
@@ -191,8 +194,8 @@ if ($path[0] == 'preview') {
 <?php elseif (!array_key_exists('approve', $_POST)): ?>
 <form method="POST">
 	<p>Don't share these previews! If they look good, click "Generate Safe URL" for a safely sharable URL</p>
-	<img src="/index.php/preview?id=<?= $_SESSION['meme']['id'] ?>" />
-	<img src="/index.php/preview?id=<?= $_SESSION['meme']['id'] ?>&secure" />
+	<img src="/index.php/preview" />
+	<img src="/index.php/preview?secure" />
 	<input type="hidden" name="approve" />
 	<button type="submit">Generate Safe URL</button>
 </form>
